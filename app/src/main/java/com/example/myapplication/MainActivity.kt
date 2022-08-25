@@ -27,16 +27,30 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         setContent {
             MyApplicationTheme {
+                val player1 = Player(
+                    listOf(
+                        Card(CardType.Club, 5),
+                        Card(CardType.Heart, 2),
+                        Card(CardType.Spade, 9)
+                    )
+                )
+                val player2 = Player(
+                    listOf(
+                        Card(CardType.Club, 2),
+                        Card(CardType.Heart, 3),
+                        Card(CardType.Spade, 4)
+                    )
+                )
                 Column(modifier = Modifier.fillMaxSize()) {
                     Row(horizontalArrangement = Arrangement.spacedBy(2.dp)) {
-                        for (a in 1..7){
+                        for (a in 1..7) {
                             Card(R.drawable.reverse_playing_card)
                         }
                     }
                     Row(
                         modifier = Modifier.weight(1f),
                         verticalAlignment = Alignment.CenterVertically
-                    ){
+                    ) {
                         Box(modifier = Modifier.weight(1f))
                         Card(R.drawable.hearts_10)
                         Box(modifier = Modifier.weight(1f))
@@ -45,8 +59,8 @@ class MainActivity : ComponentActivity() {
 
                     }
                     Row(horizontalArrangement = Arrangement.spacedBy(2.dp)) {
-                        for (a in 1..7) {
-                            Card(R.drawable.diamonds_10)
+                        player2.cards.forEach { card: Card ->
+                            Card(resId = card.getDrawable())
                         }
                     }
                 }
@@ -57,11 +71,13 @@ class MainActivity : ComponentActivity() {
 
 
 @Composable
-fun RowScope.Card(@DrawableRes resId: Int){
-        Image(
-            painter = painterResource(id = resId),
-            contentDescription = null,
-            modifier = Modifier.weight(1f).height(90.dp),
-            contentScale = ContentScale.Fit
-        )
+fun RowScope.Card(@DrawableRes resId: Int) {
+    Image(
+        painter = painterResource(id = resId),
+        contentDescription = null,
+        modifier = Modifier
+            .weight(1f)
+            .height(90.dp),
+        contentScale = ContentScale.Fit
+    )
 }
