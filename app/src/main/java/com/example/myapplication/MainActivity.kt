@@ -34,11 +34,11 @@ class MainActivity : ComponentActivity() {
                         modifier = Modifier.weight(1f),
                         verticalAlignment = Alignment.CenterVertically
                     ){
-                        Box(modifier = Modifier.weight(1f))
+                        Box(modifier = Modifier.weight(1f).size(width = 90.dp, height = 135.dp))
                         Card()
-                        Box(modifier = Modifier.weight(1f))
+                        Box(modifier = Modifier.weight(1f).size(width = 90.dp, height = 135.dp))
                         Card()
-                        Box(modifier = Modifier.weight(1f))
+                        Box(modifier = Modifier.weight(1f).size(width = 90.dp, height = 135.dp))
 
                     }
                     Row() {
