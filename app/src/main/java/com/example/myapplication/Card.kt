@@ -1,7 +1,14 @@
 package com.example.myapplication
 
 import androidx.annotation.DrawableRes
+import androidx.compose.material.Card
 import java.lang.IllegalArgumentException
+
+val cardDeck: List<Card> = CardType.values().map { cardType ->
+    CardNumber.values().map { cardNumber ->
+        Card(cardType, cardNumber)
+    }
+}.flatten()
 
 data class Card(
     val type: CardType,
