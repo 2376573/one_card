@@ -29,24 +29,20 @@ class MainActivity : ComponentActivity() {
             MyApplicationTheme {
                 val player1 = Player(
                     listOf(
-                        Card(CardType.Club, 5),
-                        Card(CardType.Heart, 2),
-                        Card(CardType.Spade, 9)
+                        Card(CardType.Club, CardNumber.Num5),
+                        Card(CardType.Heart, CardNumber.Num2),
+                        Card(CardType.Spade, CardNumber.Num9)
                     )
                 )
                 val player2 = Player(
                     listOf(
-                        Card(CardType.Club, 2),
-                        Card(CardType.Heart, 3),
-                        Card(CardType.Spade, 4)
+                        Card(CardType.Club, CardNumber.Num2),
+                        Card(CardType.Heart, CardNumber.Num3),
+                        Card(CardType.Spade, CardNumber.Num4)
                     )
                 )
                 Column(modifier = Modifier.fillMaxSize()) {
-                    Row(horizontalArrangement = Arrangement.spacedBy(2.dp)) {
-                        for (a in 1..7) {
-                            Card(R.drawable.reverse_playing_card)
-                        }
-                    }
+                    playerCard(player = player1)
                     Row(
                         modifier = Modifier.weight(1f),
                         verticalAlignment = Alignment.CenterVertically
@@ -58,11 +54,7 @@ class MainActivity : ComponentActivity() {
                         Box(modifier = Modifier.weight(1f))
 
                     }
-                    Row(horizontalArrangement = Arrangement.spacedBy(2.dp)) {
-                        player2.cards.forEach { card: Card ->
-                            Card(resId = card.getDrawable())
-                        }
-                    }
+                    playerCard(player = player2)
                 }
             }
         }
@@ -76,8 +68,15 @@ fun RowScope.Card(@DrawableRes resId: Int) {
         painter = painterResource(id = resId),
         contentDescription = null,
         modifier = Modifier
-            .weight(1f)
-            .height(90.dp),
+            .weight(1f),
         contentScale = ContentScale.Fit
     )
+}
+@Composable
+fun playerCard(player: Player){
+    Row(horizontalArrangement = Arrangement.spacedBy(2.dp)) {
+        player.cards.forEach { card: Card ->
+            Card(resId = card.getDrawable())
+        }
+    }
 }
