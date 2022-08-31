@@ -9,6 +9,10 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.setValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
@@ -21,30 +25,49 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         setContent {
             MyApplicationTheme {
-                val shuffledDeck = cardDeck.shuffled()
-                var remainCards: List<Card> = emptyList()
-                var openCards: List<Card> = emptyList()
-                val player1 = Player(shuffledDeck.take(7))
+                val shuffledDeck by remember {
+                    mutableStateOf(cardDeck.shuffled())
+                }
+                var remainCards: List<Card> by remember {
+                    mutableStateOf(emptyList())
+                }
+                var openCards: List<Card> by remember {
+                    mutableStateOf(emptyList())
+                }
+                val player1 by remember {
+                   mutableStateOf(Player(shuffledDeck.take(7)))
+                }
                 remainCards = shuffledDeck - player1.cards
-                val player2 = Player(remainCards.take(7))
+                var player2 by remember {
+                    mutableStateOf(Player(remainCards.take(7)))
+                }
                 remainCards = remainCards - player2.cards
-                openCards = remainCards.take(1)
+                if(openCards.isEmpty()){
+                    openCards = remainCards.take(1)
+                }
                 remainCards = remainCards - openCards
 
                 Column(modifier = Modifier.fillMaxSize()) {
-                    playerCard(player = player1)
+                    playerCard(player = player1){
+                        TODO()
+                    }
                     Row(
                         modifier = Modifier.weight(1f),
                         verticalAlignment = Alignment.CenterVertically
                     ) {
                         Box(modifier = Modifier.weight(1f))
-                        CardView(openCards.last())
+                        CardView(openCards.last()) {
+                            // Nothing to do.
+                        }
                         Box(modifier = Modifier.weight(1f))
                         CardBackView()
                         Box(modifier = Modifier.weight(1f))
 
                     }
-                    playerCard(player = player2)
+                    playerCard(player = player2){
+                        openCards += listOf(it)
+                        player2 = Player(player2.cards - listOf(it))
+                    }
                 }
             }
         }
@@ -54,7 +77,7 @@ class MainActivity : ComponentActivity() {
 
 
 @Composable
-fun RowScope.CardView(card: Card) {
+fun RowScope.CardView(card: Card, onclick: (Card) -> Unit) {
     Image(
         painter = painterResource(id = card.getDrawable()),
         contentDescription = null,
@@ -62,6 +85,7 @@ fun RowScope.CardView(card: Card) {
             .weight(1f)
             .clickable {
                 Log.i("OneCard", "Clicked card type = ${card.type}, num = ${card.num}")
+                onclick(card)
             },
         contentScale = ContentScale.Fit
     )
@@ -71,15 +95,19 @@ fun RowScope.CardBackView(){
     Image(
         painter = painterResource(id = R.drawable.reverse_playing_card),
         contentDescription = null,
-        modifier = Modifier.weight(1f),
+        modifier = Modifier
+            .weight(1f)
+            .clickable {
+                Log.i("OneCard", "Clicked card type = Back, num = 0")
+            },
         contentScale = ContentScale.Fit
     )
 }
 @Composable
-fun playerCard(player: Player){
+fun playerCard(player: Player, onclick: (Card) -> Unit){
     Row(horizontalArrangement = Arrangement.spacedBy(2.dp)) {
         player.cards.forEach { card: Card ->
-            CardView(card)
+            CardView(card, onclick)
         }
     }
 }
