@@ -29,7 +29,7 @@ class MainActivity : ComponentActivity() {
                     mutableStateOf(cardDeck.shuffled())
                 }
                 var remainCards: List<Card> by remember {
-                    mutableStateOf(emptyList())
+                    mutableStateOf(shuffledDeck)
                 }
                 var openCards: List<Card> by remember {
                     mutableStateOf(emptyList())
@@ -37,7 +37,7 @@ class MainActivity : ComponentActivity() {
                 val player1 by remember {
                    mutableStateOf(Player(shuffledDeck.take(7)))
                 }
-                remainCards = shuffledDeck - player1.cards
+                remainCards = remainCards - player1.cards
                 var player2 by remember {
                     mutableStateOf(Player(remainCards.take(7)))
                 }
@@ -49,7 +49,7 @@ class MainActivity : ComponentActivity() {
 
                 Column(modifier = Modifier.fillMaxSize()) {
                     playerCard(player = player1){
-                        TODO()
+                        /*TODO()*/
                     }
                     Row(
                         modifier = Modifier.weight(1f),
@@ -60,13 +60,17 @@ class MainActivity : ComponentActivity() {
                             // Nothing to do.
                         }
                         Box(modifier = Modifier.weight(1f))
-                        CardBackView()
+                        CardBackView{
+                            player2 = Player(player2.cards + remainCards.take(1))
+                        }
                         Box(modifier = Modifier.weight(1f))
 
                     }
                     playerCard(player = player2){
-                        openCards += listOf(it)
-                        player2 = Player(player2.cards - listOf(it))
+                        if(openCards.last().type == it.type || openCards.last().num == it.num){
+                            openCards += listOf(it)
+                            player2 = Player(player2.cards - listOf(it))
+                        }
                     }
                 }
             }
@@ -91,7 +95,7 @@ fun RowScope.CardView(card: Card, onclick: (Card) -> Unit) {
     )
 }
 @Composable
-fun RowScope.CardBackView(){
+fun RowScope.CardBackView(onclick: () -> Unit){
     Image(
         painter = painterResource(id = R.drawable.reverse_playing_card),
         contentDescription = null,
@@ -99,6 +103,7 @@ fun RowScope.CardBackView(){
             .weight(1f)
             .clickable {
                 Log.i("OneCard", "Clicked card type = Back, num = 0")
+                onclick()
             },
         contentScale = ContentScale.Fit
     )
