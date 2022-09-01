@@ -41,54 +41,54 @@ class MainActivity : ComponentActivity() {
 }
 @Composable
 fun OneCardGameScreen(onGameOver: (Player) -> Unit){
-            var viewState: OneCardViewState by remember {
-                    mutableStateOf(OneCardViewState.createGame())
-                }
-                Column(modifier = Modifier.fillMaxSize()) {
-                    playerCard(player = viewState.player1) {
+    var viewState: OneCardViewState by remember {
+        mutableStateOf(OneCardViewState.createGame())
+    }
+    Column(modifier = Modifier.fillMaxSize()) {
+        playerCard(player = viewState.player1) {
 
-                    }
-                    Row(
-                        modifier = Modifier.weight(1f),
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        Box(modifier = Modifier.weight(1f))
-                        CardView(modifier = Modifier.height(120.dp), viewState.openCards.last()) {
-                            // Nothing to do.
-                        }
-                        Box(modifier = Modifier.weight(1f))
-                        CardBackView(modifier = Modifier.height(120.dp)) {
-                            val c = viewState.remainCards.take(1)
-                            if(viewState.remainCards.isEmpty()){
-                                viewState = viewState.copy(
-                                    remainCards = viewState.openCards.subList(0, viewState.openCards.size - 1).shuffled(),
-                                    openCards = listOf(viewState.openCards.last())
-                                )
-                            }
-                            viewState = viewState.copy(
-                                player2 = Player("user",false,viewState.player2.cards + c),
-                                remainCards = viewState.remainCards - c
-                            )
-                            viewState = viewState.throwCardByNPC()
-                        }
-                        Box(modifier = Modifier.weight(1f))
-                    }
-                    playerCard(player = viewState.player2) {
-                        val state = viewState.throwCard(it)
-                        if(state != null){
-                            viewState = state
-                            if(viewState.player2.cards.isEmpty()){
-                                onGameOver(viewState.player2)
-                            }else{
-                                viewState = viewState.throwCardByNPC()
-                                if(viewState.player1.cards.isEmpty()){
-                                    onGameOver(viewState.player1)
-                                }
-                            }
-                        }
+        }
+        Row(
+            modifier = Modifier.weight(1f),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Box(modifier = Modifier.weight(1f))
+            CardView(modifier = Modifier.height(120.dp), viewState.openCards.last()) {
+                // Nothing to do.
+            }
+            Box(modifier = Modifier.weight(1f))
+            CardBackView(modifier = Modifier.height(120.dp)) {
+                val c = viewState.remainCards.take(1)
+                if(viewState.remainCards.isEmpty()){
+                    viewState = viewState.copy(
+                        remainCards = viewState.openCards.subList(0, viewState.openCards.size - 1).shuffled(),
+                        openCards = listOf(viewState.openCards.last())
+                    )
+                }
+                viewState = viewState.copy(
+                    player2 = Player("user",false,viewState.player2.cards + c),
+                    remainCards = viewState.remainCards - c
+                )
+                viewState = viewState.throwCardByNPC()
+            }
+            Box(modifier = Modifier.weight(1f))
+        }
+        playerCard(player = viewState.player2) {
+            val state = viewState.throwCard(it)
+            if(state != null){
+                viewState = state
+                if(viewState.player2.cards.isEmpty()){
+                    onGameOver(viewState.player2)
+                }else{
+                    viewState = viewState.throwCardByNPC()
+                    if(viewState.player1.cards.isEmpty()){
+                        onGameOver(viewState.player1)
                     }
                 }
             }
+        }
+    }
+}
 
 
 
