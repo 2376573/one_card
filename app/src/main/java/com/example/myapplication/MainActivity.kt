@@ -25,51 +25,37 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         setContent {
             MyApplicationTheme {
-                val shuffledDeck by remember {
-                    mutableStateOf(cardDeck.shuffled())
+                var viewState: OneCardViewState by remember {
+                    mutableStateOf(OneCardViewState.createGame())
                 }
-                var remainCards: List<Card> by remember {
-                    mutableStateOf(shuffledDeck)
-                }
-                var openCards: List<Card> by remember {
-                    mutableStateOf(emptyList())
-                }
-                val player1 by remember {
-                   mutableStateOf(Player(shuffledDeck.take(7)))
-                }
-                remainCards = remainCards - player1.cards
-                var player2 by remember {
-                    mutableStateOf(Player(remainCards.take(7)))
-                }
-                remainCards = remainCards - player2.cards
-                if(openCards.isEmpty()){
-                    openCards = remainCards.take(1)
-                }
-                remainCards = remainCards - openCards
 
                 Column(modifier = Modifier.fillMaxSize()) {
-                    playerCard(player = player1){
-                        /*TODO()*/
+                    playerCard(player = viewState.player1) {
+
                     }
                     Row(
                         modifier = Modifier.weight(1f),
                         verticalAlignment = Alignment.CenterVertically
                     ) {
                         Box(modifier = Modifier.weight(1f))
-                        CardView(openCards.last()) {
+                        CardView(viewState.openCards.last()) {
                             // Nothing to do.
                         }
                         Box(modifier = Modifier.weight(1f))
-                        CardBackView{
-                            player2 = Player(player2.cards + remainCards.take(1))
+                        CardBackView {
+                            viewState = viewState.copy(
+                                player2 = Player(viewState.player2.cards + viewState.remainCards.take(1)),
+                                remainCards = viewState.remainCards - viewState.remainCards.take(1)
+                            )
+                            viewState = viewState.throwCardByNPC()
                         }
                         Box(modifier = Modifier.weight(1f))
-
                     }
-                    playerCard(player = player2){
-                        if(openCards.last().type == it.type || openCards.last().num == it.num){
-                            openCards += listOf(it)
-                            player2 = Player(player2.cards - listOf(it))
+                    playerCard(player = viewState.player2) {
+                        val state = viewState.throwCard(it)
+                        if(state != null){
+                            viewState = state
+                            viewState = viewState.throwCardByNPC()
                         }
                     }
                 }
@@ -79,7 +65,6 @@ class MainActivity : ComponentActivity() {
 }
 
 
-
 @Composable
 fun RowScope.CardView(card: Card, onclick: (Card) -> Unit) {
     Image(
@@ -87,6 +72,7 @@ fun RowScope.CardView(card: Card, onclick: (Card) -> Unit) {
         contentDescription = null,
         modifier = Modifier
             .weight(1f)
+            .height(120.dp)
             .clickable {
                 Log.i("OneCard", "Clicked card type = ${card.type}, num = ${card.num}")
                 onclick(card)
@@ -94,8 +80,9 @@ fun RowScope.CardView(card: Card, onclick: (Card) -> Unit) {
         contentScale = ContentScale.Fit
     )
 }
+
 @Composable
-fun RowScope.CardBackView(onclick: () -> Unit){
+fun RowScope.CardBackView(onclick: () -> Unit) {
     Image(
         painter = painterResource(id = R.drawable.reverse_playing_card),
         contentDescription = null,
@@ -108,8 +95,9 @@ fun RowScope.CardBackView(onclick: () -> Unit){
         contentScale = ContentScale.Fit
     )
 }
+
 @Composable
-fun playerCard(player: Player, onclick: (Card) -> Unit){
+fun playerCard(player: Player, onclick: (Card) -> Unit) {
     Row(horizontalArrangement = Arrangement.spacedBy(2.dp)) {
         player.cards.forEach { card: Card ->
             CardView(card, onclick)
