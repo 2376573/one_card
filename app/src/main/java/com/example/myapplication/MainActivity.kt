@@ -4,7 +4,6 @@ import android.os.Bundle
 import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.annotation.DrawableRes
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -25,7 +24,24 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         setContent {
             MyApplicationTheme {
-                var viewState: OneCardViewState by remember {
+                var winner: Player? by remember {
+                    mutableStateOf(null)
+                }
+                val currentWinner = winner
+                if (currentWinner == null) {
+                    OneCardGameScreen(onGameOver = {
+                        winner = it
+                    })
+                } else {
+                    VictoryScreen(player = currentWinner)
+                }
+            }
+        }
+    }
+}
+@Composable
+fun OneCardGameScreen(onGameOver: (Player) -> Unit){
+            var viewState: OneCardViewState by remember {
                     mutableStateOf(OneCardViewState.createGame())
                 }
                 Column(modifier = Modifier.fillMaxSize()) {
@@ -50,7 +66,7 @@ class MainActivity : ComponentActivity() {
                                 )
                             }
                             viewState = viewState.copy(
-                                player2 = Player(false,viewState.player2.cards + c),
+                                player2 = Player("user",false,viewState.player2.cards + c),
                                 remainCards = viewState.remainCards - c
                             )
                             viewState = viewState.throwCardByNPC()
@@ -62,20 +78,18 @@ class MainActivity : ComponentActivity() {
                         if(state != null){
                             viewState = state
                             if(viewState.player2.cards.isEmpty()){
-
+                                onGameOver(viewState.player2)
                             }else{
                                 viewState = viewState.throwCardByNPC()
                                 if(viewState.player1.cards.isEmpty()){
-
+                                    onGameOver(viewState.player1)
                                 }
                             }
                         }
                     }
                 }
             }
-        }
-    }
-}
+
 
 
 @Composable

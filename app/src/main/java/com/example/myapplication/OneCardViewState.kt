@@ -15,7 +15,7 @@ data class OneCardViewState (
         return if(openCards.last().type == card.type || openCards.last().num == card.num){
             copy(
                 openCards = openCards + listOf(card),
-                player2 = Player(false,player2.cards - listOf(card))
+                player2 = Player("user",false,player2.cards - listOf(card))
             )
         }
         else {
@@ -31,11 +31,12 @@ data class OneCardViewState (
         return if(throwCandidate != null){
             copy(
                 openCards = openCards + listOf(throwCandidate),
-                player1 = Player(true,player1.cards - listOf(throwCandidate))
+                player1 = player1.copy(cards = player1.cards - listOf(throwCandidate))
             )
         } else{
+            val c = remainCards.take(1)
             copy(
-                player1 = Player(true,player1.cards + remainCards.take(1)),
+                player1 = player1.copy(cards = player1.cards + c),
                 remainCards = remainCards - remainCards.take(1)
             )
         }
@@ -46,9 +47,9 @@ data class OneCardViewState (
             val shuffledDeck = cardDeck.shuffled()
             var remainCards: List<Card> = emptyList()
             var openCards: List<Card> = emptyList()
-            val player1 = Player(true,shuffledDeck.take(7))
+            val player1 = Player("user",true,shuffledDeck.take(7))
             remainCards = shuffledDeck - player1.cards
-            val player2 = Player(false,remainCards.take(7))
+            val player2 = Player("user",false,remainCards.take(7))
             remainCards = remainCards - player2.cards
             openCards = remainCards.take(1)
             remainCards = remainCards - openCards
