@@ -28,7 +28,6 @@ class MainActivity : ComponentActivity() {
                 var viewState: OneCardViewState by remember {
                     mutableStateOf(OneCardViewState.createGame())
                 }
-
                 Column(modifier = Modifier.fillMaxSize()) {
                     playerCard(player = viewState.player1) {
 
@@ -38,14 +37,21 @@ class MainActivity : ComponentActivity() {
                         verticalAlignment = Alignment.CenterVertically
                     ) {
                         Box(modifier = Modifier.weight(1f))
-                        CardView(viewState.openCards.last()) {
+                        CardView(modifier = Modifier.height(120.dp), viewState.openCards.last()) {
                             // Nothing to do.
                         }
                         Box(modifier = Modifier.weight(1f))
-                        CardBackView {
+                        CardBackView(modifier = Modifier.height(120.dp)) {
+                            val c = viewState.remainCards.take(1)
+                            if(viewState.remainCards.isEmpty()){
+                                viewState = viewState.copy(
+                                    remainCards = viewState.openCards.subList(0, viewState.openCards.size - 1).shuffled(),
+                                    openCards = listOf(viewState.openCards.last())
+                                )
+                            }
                             viewState = viewState.copy(
-                                player2 = Player(viewState.player2.cards + viewState.remainCards.take(1)),
-                                remainCards = viewState.remainCards - viewState.remainCards.take(1)
+                                player2 = Player(false,viewState.player2.cards + c),
+                                remainCards = viewState.remainCards - c
                             )
                             viewState = viewState.throwCardByNPC()
                         }
@@ -55,7 +61,14 @@ class MainActivity : ComponentActivity() {
                         val state = viewState.throwCard(it)
                         if(state != null){
                             viewState = state
-                            viewState = viewState.throwCardByNPC()
+                            if(viewState.player2.cards.isEmpty()){
+
+                            }else{
+                                viewState = viewState.throwCardByNPC()
+                                if(viewState.player1.cards.isEmpty()){
+
+                                }
+                            }
                         }
                     }
                 }
@@ -66,13 +79,11 @@ class MainActivity : ComponentActivity() {
 
 
 @Composable
-fun RowScope.CardView(card: Card, onclick: (Card) -> Unit) {
+fun CardView(modifier: Modifier = Modifier, card: Card, onclick: (Card) -> Unit) {
     Image(
         painter = painterResource(id = card.getDrawable()),
         contentDescription = null,
-        modifier = Modifier
-            .weight(1f)
-            .height(120.dp)
+        modifier = modifier
             .clickable {
                 Log.i("OneCard", "Clicked card type = ${card.type}, num = ${card.num}")
                 onclick(card)
@@ -82,12 +93,11 @@ fun RowScope.CardView(card: Card, onclick: (Card) -> Unit) {
 }
 
 @Composable
-fun RowScope.CardBackView(onclick: () -> Unit) {
+fun CardBackView(modifier: Modifier = Modifier,onclick: () -> Unit) {
     Image(
         painter = painterResource(id = R.drawable.reverse_playing_card),
         contentDescription = null,
-        modifier = Modifier
-            .weight(1f)
+        modifier = modifier
             .clickable {
                 Log.i("OneCard", "Clicked card type = Back, num = 0")
                 onclick()
@@ -98,9 +108,21 @@ fun RowScope.CardBackView(onclick: () -> Unit) {
 
 @Composable
 fun playerCard(player: Player, onclick: (Card) -> Unit) {
-    Row(horizontalArrangement = Arrangement.spacedBy(2.dp)) {
-        player.cards.forEach { card: Card ->
-            CardView(card, onclick)
+    BoxWithConstraints(Modifier.fillMaxWidth()) {
+        val cardWidth = maxWidth / 7
+        val cards = player.cards.windowed(7,7, partialWindows = true)
+        Column {
+            cards.forEach{
+                Row() {
+                    it.forEach { card: Card ->
+                        if(!player.discrimination) CardView(Modifier.width(cardWidth),card, onclick)
+                        else CardBackView(Modifier.width(cardWidth)){
+
+                        }
+                    }
+                }
+            }
         }
+
     }
 }
