@@ -1,6 +1,6 @@
 package com.example.myapplication
 
-import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 
 
@@ -15,14 +15,13 @@ data class OneCardViewState (
         return if(openCards.last().type == card.type || openCards.last().num == card.num){
             copy(
                 openCards = openCards + listOf(card),
-                player2 = Player("user",false,player2.cards - listOf(card))
+                player2 = player2.copy(cards = player2.cards - listOf(card))
             )
         }
         else {
             null
         }
     }
-
     fun throwCardByNPC(): OneCardViewState {
         val throwCandidate = player1.cards.firstOrNull {
             it.type == openCards.last().type
@@ -47,7 +46,7 @@ data class OneCardViewState (
             val shuffledDeck = cardDeck.shuffled()
             var remainCards: List<Card> = emptyList()
             var openCards: List<Card> = emptyList()
-            val player1 = Player("user",true,shuffledDeck.take(7))
+            val player1 = Player("CPU",true,shuffledDeck.take(7))
             remainCards = shuffledDeck - player1.cards
             val player2 = Player("user",false,remainCards.take(7))
             remainCards = remainCards - player2.cards

@@ -9,6 +9,6 @@ import androidx.compose.material.Text
 @Composable
 fun VictoryScreen(player: Player){
     Box(modifier = Modifier.fillMaxSize()){
-        Text(text = "Winner is ${player.toString()}")
+        Text(text = "Winner is ${player.name}")
     }
 }
