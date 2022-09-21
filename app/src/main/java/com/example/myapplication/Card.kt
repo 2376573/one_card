@@ -4,6 +4,7 @@ import androidx.annotation.DrawableRes
 import androidx.compose.material.Card
 import java.lang.IllegalArgumentException
 
+//카드덱 생성
 val cardDeck: List<Card> = CardType.values().map { cardType ->
     CardNumber.values().map { cardNumber ->
         Card(cardType, cardNumber)
