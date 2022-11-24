@@ -101,7 +101,7 @@ class MainActivity : ComponentActivity() {
                     viewState = state
                     //플레이어2의 카드가 모두 사라졌을 경우 플레이어2 우승
                     if(viewState.player2.cards.isEmpty()){
-                        onGameOver(viewState.player2)
+                            onGameOver(viewState.player2)
                     }
                     else{
                         //플레이어1의 카드가 모두 사라졌을 경우 플레이어1 우승
